@@ -1,12 +1,21 @@
 import { Message } from './lib/types';
 
+async function injectAndSend(tabId: number, msg: Message) {
+  try {
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['content.js'] });
+  } catch {} // Already injected or restricted page (chrome://, etc.)
+  try {
+    chrome.tabs.sendMessage(tabId, msg);
+  } catch {}
+}
+
 // Handle keyboard shortcut
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === 'fill-form') {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) return;
 
-    chrome.tabs.sendMessage(tab.id, { type: 'FILL_WITH_SHORTCUT' } satisfies Message);
+    injectAndSend(tab.id, { type: 'FILL_WITH_SHORTCUT' });
   }
 });
 
@@ -21,7 +30,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'quickfill-fill' && tab?.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'FILL_WITH_SHORTCUT' } satisfies Message);
+    injectAndSend(tab.id, { type: 'FILL_WITH_SHORTCUT' });
   }
 });
 

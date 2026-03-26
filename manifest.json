@@ -15,13 +15,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    }
-  ],
   "options_page": "options/options.html",
   "commands": {
     "fill-form": {

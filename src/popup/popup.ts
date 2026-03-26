@@ -53,10 +53,13 @@ async function init() {
   detectFields();
 }
 
-/** Send message to content script on active tab */
+/** Send message to content script on active tab, injecting it first if needed */
 async function sendToTab(msg: Message): Promise<any> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return null;
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
+  } catch {} // Already injected or restricted page
   try {
     return await chrome.tabs.sendMessage(tab.id, msg);
   } catch {
