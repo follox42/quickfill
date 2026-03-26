@@ -1,0 +1,17 @@
+{
+  "name": "quickfill",
+  "version": "1.0.0",
+  "description": "Smart form auto-filler — fill any form in one click",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0",
+    "@anthropic-ai/claude-code": "^1.0.0"
+  }
+}
