@@ -1,5 +1,6 @@
 import { getProfiles, saveProfiles, getSettings, saveSettings } from '../lib/storage';
 import { Profile, FieldType, generateId } from '../lib/types';
+import { isUserPro, showUpgradeModal } from '../lib/paywall';
 
 let profiles: Profile[] = [];
 let activeProfileId: string | null = null;
@@ -68,11 +69,18 @@ function renderProfilesList() {
 }
 
 /** Render the profile limit indicator */
-function renderLimit() {
-  $profileLimit.textContent = `Free plan: ${profiles.length}/${MAX_FREE_PROFILES} profiles`;
-  $btnAdd.disabled = profiles.length >= MAX_FREE_PROFILES;
-  if (profiles.length >= MAX_FREE_PROFILES) {
-    $btnAdd.title = 'Upgrade to Pro for unlimited profiles';
+async function renderLimit() {
+  const pro = await isUserPro();
+  if (pro) {
+    $profileLimit.textContent = 'Pro plan: Unlimited profiles';
+    $btnAdd.disabled = false;
+    $btnAdd.title = 'Add profile';
+  } else {
+    $profileLimit.textContent = `Free plan: ${profiles.length}/${MAX_FREE_PROFILES} profiles`;
+    $btnAdd.disabled = false; // always enabled — modal shown on click
+    $btnAdd.title = profiles.length >= MAX_FREE_PROFILES
+      ? 'Upgrade to Pro for unlimited profiles'
+      : 'Add profile';
   }
 }
 
@@ -136,7 +144,11 @@ async function saveCurrentProfile() {
 
 // Event: Add profile
 $btnAdd.addEventListener('click', async () => {
-  if (profiles.length >= MAX_FREE_PROFILES) return;
+  const pro = await isUserPro();
+  if (!pro && profiles.length >= MAX_FREE_PROFILES) {
+    showUpgradeModal();
+    return;
+  }
 
   const icons = ['🏠', '💼', '🧪', '🎮', '🎨', '📱', '🌐', '🔬'];
   const newProfile: Profile = {
@@ -199,6 +211,14 @@ $profileForm.addEventListener('input', () => {
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(saveCurrentProfile, 500);
 });
+
+// Event: Upgrade banner click
+const $upgradeBanner = document.getElementById('upgrade-banner');
+if ($upgradeBanner) {
+  $upgradeBanner.addEventListener('click', () => {
+    showUpgradeModal();
+  });
+}
 
 // Init
 init();
