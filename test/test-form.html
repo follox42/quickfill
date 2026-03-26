@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickFill Test — Form Detection</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px; }
+    h1 { margin-bottom: 8px; color: #fff; }
+    .subtitle { color: #94a3b8; margin-bottom: 32px; }
+    .forms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; }
+    .form-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; }
+    .form-card h2 { font-size: 16px; margin-bottom: 16px; color: #818cf8; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 8px 12px; border: 1px solid #475569; border-radius: 6px;
+      background: #0f172a; color: #e2e8f0; font-size: 14px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result { margin-top: 32px; background: #1e293b; border-radius: 12px; padding: 24px; max-width: 900px; }
+    .result h2 { margin-bottom: 12px; color: #22c55e; }
+    #test-output { font-family: monospace; font-size: 13px; white-space: pre-wrap; color: #94a3b8; }
+    button.test-btn {
+      margin-top: 24px; padding: 12px 24px; background: #6366f1; color: white;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    button.test-btn:hover { background: #4f46e5; }
+  </style>
+</head>
+<body>
+  <h1>QuickFill Test Page</h1>
+  <p class="subtitle">Test form detection and filling across different form patterns</p>
+
+  <div class="forms-grid">
+    <!-- Form 1: Standard signup with autocomplete -->
+    <div class="form-card">
+      <h2>1. Signup (autocomplete attributes)</h2>
+      <form id="form-signup">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="signup-fname">First Name</label>
+            <input type="text" id="signup-fname" name="firstName" autocomplete="given-name" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label for="signup-lname">Last Name</label>
+            <input type="text" id="signup-lname" name="lastName" autocomplete="family-name" placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" name="email" autocomplete="email" placeholder="john@example.com">
+        </div>
+        <div class="form-group">
+          <label for="signup-phone">Phone</label>
+          <input type="tel" id="signup-phone" name="phone" autocomplete="tel" placeholder="+33 6 00 00 00 00">
+        </div>
+      </form>
+    </div>
+
+    <!-- Form 2: Checkout with address -->
+    <div class="form-card">
+      <h2>2. Checkout (name/id matching)</h2>
+      <form id="form-checkout">
+        <div class="form-group">
+          <label for="billing_name">Full Name</label>
+          <input type="text" id="billing_name" name="full_name">
+        </div>
+        <div class="form-group">
+          <label for="billing_email">Email Address</label>
+          <input type="email" id="billing_email" name="email_address">
+        </div>
+        <div class="form-group">
+          <label for="billing_addr">Street Address</label>
+          <input type="text" id="billing_addr" name="street_address">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="billing_city">City</label>
+            <input type="text" id="billing_city" name="city">
+          </div>
+          <div class="form-group">
+            <label for="billing_zip">Zip Code</label>
+            <input type="text" id="billing_zip" name="postal_code">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="billing_country">Country</label>
+          <select id="billing_country" name="country">
+            <option value="">Select...</option>
+            <option value="FR">France</option>
+            <option value="US">United States</option>
+            <option value="UK">United Kingdom</option>
+            <option value="DE">Germany</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <!-- Form 3: Contact with labels only -->
+    <div class="form-card">
+      <h2>3. Contact (label-based detection)</h2>
+      <form id="form-contact">
+        <div class="form-group">
+          <label for="c-input-1">Your Name</label>
+          <input type="text" id="c-input-1" name="field1">
+        </div>
+        <div class="form-group">
+          <label for="c-input-2">Your Email</label>
+          <input type="text" id="c-input-2" name="field2">
+        </div>
+        <div class="form-group">
+          <label for="c-input-3">Phone Number</label>
+          <input type="text" id="c-input-3" name="field3">
+        </div>
+        <div class="form-group">
+          <label for="c-input-4">Company</label>
+          <input type="text" id="c-input-4" name="field4">
+        </div>
+        <div class="form-group">
+          <label for="c-input-5">Job Title</label>
+          <input type="text" id="c-input-5" name="field5">
+        </div>
+      </form>
+    </div>
+
+    <!-- Form 4: French form -->
+    <div class="form-card">
+      <h2>4. Formulaire FR (detection francaise)</h2>
+      <form id="form-fr">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fr-prenom">Prenom</label>
+            <input type="text" id="fr-prenom" name="prenom">
+          </div>
+          <div class="form-group">
+            <label for="fr-nom">Nom</label>
+            <input type="text" id="fr-nom" name="nom">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="fr-email">Courriel</label>
+          <input type="text" id="fr-email" name="courriel">
+        </div>
+        <div class="form-group">
+          <label for="fr-tel">Telephone</label>
+          <input type="text" id="fr-tel" name="telephone">
+        </div>
+        <div class="form-group">
+          <label for="fr-adresse">Adresse</label>
+          <input type="text" id="fr-adresse" name="adresse">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fr-ville">Ville</label>
+            <input type="text" id="fr-ville" name="ville">
+          </div>
+          <div class="form-group">
+            <label for="fr-cp">Code Postal</label>
+            <input type="text" id="fr-cp" name="code_postal">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Test runner (works without extension for field counting) -->
+  <button class="test-btn" id="run-test" type="button">Run Detection Test (without extension)</button>
+  <div class="result">
+    <h2>Test Results</h2>
+    <pre id="test-output">Click "Run Detection Test" to check how many fields are detectable on this page.
+Or install QuickFill and click Fill to test the extension.</pre>
+  </div>
+
+  <script>
+    document.getElementById('run-test').addEventListener('click', function() {
+      const inputs = document.querySelectorAll('input, select, textarea');
+      const output = document.getElementById('test-output');
+      let lines = [];
+      lines.push('Total input elements: ' + inputs.length);
+      lines.push('');
+      inputs.forEach(function(el) {
+        const name = el.getAttribute('name') || '-';
+        const id = el.id || '-';
+        const type = el.type || el.tagName.toLowerCase();
+        const autocomplete = el.getAttribute('autocomplete') || '-';
+        const placeholder = el.getAttribute('placeholder') || '-';
+        const label = el.labels && el.labels[0] ? el.labels[0].textContent.trim() : '-';
+        lines.push('  [' + type + '] name=' + name + '  id=' + id + '  ac=' + autocomplete + '  label="' + label + '"  ph="' + placeholder + '"');
+      });
+      output.textContent = lines.join('\n');
+    });
+  </script>
+</body>
+</html>

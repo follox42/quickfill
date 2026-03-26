@@ -172,7 +172,14 @@ $btnFill.addEventListener('click', async () => {
     const profileName = currentProfiles.find(p => p.id === profileId)?.name || 'profile';
     showStatus(`Filled ${count} field${count !== 1 ? 's' : ''} with ${profileName}`, 'success');
   } else {
-    showStatus('No matching fields found for this profile', 'error');
+    // Check if profile is empty
+    const profile = currentProfiles.find(p => p.id === profileId);
+    const hasData = profile && Object.values(profile.data).some(v => v && v.trim());
+    if (!hasData) {
+      showStatus('Profile is empty — click "Manage Profiles" to add your info', 'error');
+    } else {
+      showStatus('No matching fields on this page for your profile data', 'error');
+    }
   }
 
   setTimeout(resetFillButton, 2000);

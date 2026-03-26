@@ -26,8 +26,8 @@
   "commands": {
     "fill-form": {
       "suggested_key": {
-        "default": "Alt+F",
-        "mac": "Alt+F"
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
       },
       "description": "Fill the current form with active profile"
     }
